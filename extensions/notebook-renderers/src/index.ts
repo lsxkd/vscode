@@ -265,12 +265,20 @@ function scrollingEnabled(output: OutputItem, options: RenderOptions) {
 		metadata.scrollable : options.outputScrolling;
 }
 
+interface OutputWithAppend extends OutputItem {
+	appendedData?(): appendedText?(): string | undefined;
+}
+
 //  div.cell_container
 //    div.output_container
 //      div.output.output-stream		<-- outputElement parameter
 //        div.scrollable? tabindex="0" 	<-- contentParent
 //          div output-item-id="{guid}"	<-- content from outputItem parameter
-function renderStream(outputInfo: OutputItem, outputElement: HTMLElement, error: boolean, ctx: IRichRenderContext): IDisposable {
+function renderStream(outputInfo: OutputWithAppend, outputElement: HTMLElement, error: boolean, ctx: IRichRenderContext): IDisposable {
+	const appendedData = outputInfo.appendedData?.();
+	if (appendedData) {
+		console.log(`appending output version ${appendedData.version} content: ${appendedData.data}`);
+	}
 	const disposableStore = createDisposableStore();
 	const outputScrolling = scrollingEnabled(outputInfo, ctx.settings);
 
